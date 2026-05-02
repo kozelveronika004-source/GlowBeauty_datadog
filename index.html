@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,13 +14,13 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             background-color: var(--light);
-            color: var(--secondary);
+            overflow-x: hidden;
         }
 
-        /* Навигация */
+        /* Navigation */
         header {
             background: var(--white);
             padding: 1rem 5%;
@@ -30,28 +30,84 @@
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
         }
 
-        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
 
-        nav a {
-            text-decoration: none;
-            color: var(--secondary);
-            margin-left: 20px;
-            font-weight: 500;
+        .cart-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
             cursor: pointer;
+            position: relative;
         }
 
         .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
             background: var(--primary);
             color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-size: 0.7rem;
         }
 
-        /* Сетка товаров */
+        /* Sidebar Cart */
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: var(--white);
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .cart-sidebar.active { right: 0; }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .close-cart { cursor: pointer; font-size: 1.5rem; }
+
+        .cart-items-list {
+            flex: 1;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        /* Checkout Form inside Cart */
+        #checkout-section {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            display: none;
+        }
+
+        #checkout-section.visible { display: block; }
+
+        /* Products Grid */
         .container { padding: 2rem 5%; }
         
         .products-grid {
@@ -64,21 +120,17 @@
             background: var(--white);
             border-radius: 15px;
             overflow: hidden;
-            transition: transform 0.3s;
+            transition: 0.3s;
             box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
+            text-align: center;
         }
 
         .card:hover { transform: translateY(-5px); }
+        .card-img { height: 180px; background: #eee; }
+        .card-content { padding: 1.2rem; }
+        .price { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
 
-        .card-img { height: 200px; background: #eee; }
-
-        .card-content { padding: 1.5rem; text-align: center; }
-
-        .price { color: var(--primary); font-size: 1.2rem; font-weight: bold; }
-
-        /* Кнопки */
+        /* Buttons & Inputs */
         button {
             background: var(--primary);
             color: white;
@@ -86,99 +138,79 @@
             padding: 10px 20px;
             border-radius: 25px;
             cursor: pointer;
-            transition: opacity 0.3s;
             font-weight: 600;
-        }
-
-        button:hover { opacity: 0.8; }
-
-        .btn-delete { background: #ff7675; padding: 5px 10px; font-size: 0.8rem; }
-
-        /* Секции (вкладки) */
-        .page-section { display: none; animation: fadeIn 0.5s; }
-        .page-section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Оформление заказа */
-        .checkout-form {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-        }
-
-        input, select, textarea {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
         }
 
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 1rem;
-            margin-bottom: 10px;
-            border-radius: 10px;
+        .btn-remove { background: #ff7675; width: auto; padding: 5px 10px; font-size: 0.8rem; }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            z-index: 900;
+        }
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
 <header>
     <div class="logo">GlowBeauty</div>
-    <nav>
-        <a onclick="showPage('home')">Главная</a>
-        <a onclick="showPage('cart')">Корзина <span id="cart-counter" class="cart-badge">0</span></a>
-    </nav>
+    <button class="cart-icon-btn" onclick="toggleCart()">
+        🛒 <span id="cart-counter" class="cart-badge">0</span>
+    </button>
 </header>
 
 <div class="container">
-    <!-- ГЛАВНАЯ СТРАНИЦА -->
-    <section id="home" class="page-section active">
-        <h2>Популярные товары</h2>
-        <div id="products-list" class="products-grid"></div>
-    </section>
+    <h2>Popular Products</h2>
+    <div id="products-list" class="products-grid"></div>
+</div>
 
-    <!-- КОРЗИНА -->
-    <section id="cart" class="page-section">
-        <h2>Ваша корзина</h2>
-        <div id="cart-items"></div>
-        <div style="text-align: right; margin-top: 20px;">
-            <h3 id="cart-total">Итого: $0</h3>
-            <button onclick="showPage('checkout')">Перейти к оформлению</button>
-        </div>
-    </section>
+<!-- SINGLE SIDEBAR CART -->
+<div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+        <h3>Your Cart</h3>
+        <span class="close-cart" onclick="toggleCart()">×</span>
+    </div>
 
-    <!-- ОФОРМЛЕНИЕ ЗАКАЗА -->
-    <section id="checkout" class="page-section">
-        <div class="checkout-form">
-            <h2>Оформление заказа</h2>
-            <form id="order-form" onsubmit="completeOrder(event)">
-                <label>Адрес доставки</label>
-                <input type="text" placeholder="Улица, дом, квартира" required>
-                
-                <label>Способ оплаты</label>
-                <select required>
-                    <option value="card">Банковская карта</option>
-                    <option value="cash">Наличными</option>
-                </select>
+    <div id="cart-items-list" class="cart-items-list">
+        <!-- Items added dynamically -->
+    </div>
 
-                <button type="submit" style="width: 100%; margin-top: 20px;">Подтвердить заказ</button>
-            </form>
-        </div>
-    </section>
+    <div id="cart-footer">
+        <h4 id="cart-total">Total: $0</h4>
+        <button id="go-to-checkout" onclick="showCheckout()">Proceed to Checkout</button>
+    </div>
+
+    <!-- INTEGRATED CHECKOUT -->
+    <div id="checkout-section">
+        <h3>Checkout</h3>
+        <form id="order-form" onsubmit="processOrder(event)">
+            <input type="text" placeholder="Shipping Address" required>
+            <select required>
+                <option value="">Select Payment Method</option>
+                <option value="card">Credit Card</option>
+                <option value="cash">Cash on Delivery</option>
+            </select>
+            <button type="submit" style="background: #2ecc71; margin-top: 10px;">Place Order</button>
+            <button type="button" onclick="hideCheckout()" style="background: #95a5a6; margin-top: 5px;">Back to Cart</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    // 1. Данные
     const products = [
         {id:1, name:"Hydrating Cream", price:25, color: "#ffeaa7"},
         {id:2, name:"Vitamin C Serum", price:30, color: "#fab1a0"},
@@ -188,16 +220,14 @@
         {id:6, name:"Face Mask Set", price:20, color: "#55efc4"}
     ];
 
-    let cart = JSON.parse(localStorage.getItem('glow_cart')) || [];
+    let cart = JSON.parse(localStorage.getItem('glow_cart_eng')) || [];
 
-    // 2. Навигация (Вкладки)
-    function showPage(pageId) {
-        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        if(pageId === 'cart') renderCart();
+    function toggleCart() {
+        document.getElementById('cart-sidebar').classList.toggle('active');
+        document.getElementById('overlay').classList.toggle('active');
+        hideCheckout(); // Always reset to cart view when opening/closing
     }
 
-    // 3. Логика товаров
     function initProducts() {
         const grid = document.getElementById('products-list');
         products.forEach(p => {
@@ -207,60 +237,78 @@
                     <div class="card-content">
                         <h3>${p.name}</h3>
                         <p class="price">$${p.price}</p>
-                        <button onclick="addToCart(${p.id})">В корзину</button>
+                        <button onclick="addToCart(${p.id})">Add to Cart</button>
                     </div>
                 </div>
             `;
         });
     }
 
-    // 4. Логика корзины
     function addToCart(id) {
         const product = products.find(p => p.id === id);
         cart.push(product);
-        updateUI();
+        updateCart();
     }
 
     function removeFromCart(index) {
         cart.splice(index, 1);
-        updateUI();
-        renderCart();
+        updateCart();
     }
 
-    function updateUI() {
-        localStorage.setItem('glow_cart', JSON.stringify(cart));
+    function updateCart() {
+        localStorage.setItem('glow_cart_eng', JSON.stringify(cart));
         document.getElementById('cart-counter').innerText = cart.length;
+        renderCartItems();
     }
 
-    function renderCart() {
-        const container = document.getElementById('cart-items');
+    function renderCartItems() {
+        const list = document.getElementById('cart-items-list');
         const totalElem = document.getElementById('cart-total');
-        container.innerHTML = cart.length === 0 ? '<p>Корзина пуста</p>' : '';
+        const checkoutBtn = document.getElementById('go-to-checkout');
         
+        list.innerHTML = cart.length === 0 ? '<p>Your cart is empty</p>' : '';
         let total = 0;
+
         cart.forEach((item, index) => {
             total += item.price;
-            container.innerHTML += `
+            list.innerHTML += `
                 <div class="cart-item">
-                    <span><strong>${item.name}</strong> - $${item.price}</span>
-                    <button class="btn-delete" onclick="removeFromCart(${index})">Удалить</button>
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small>$${item.price}</small>
+                    </div>
+                    <button class="btn-remove" onclick="removeFromCart(${index})">Remove</button>
                 </div>
             `;
         });
-        totalElem.innerText = `Итого: $${total}`;
+
+        totalElem.innerText = `Total: $${total}`;
+        checkoutBtn.style.display = cart.length > 0 ? 'block' : 'none';
     }
 
-    function completeOrder(e) {
+    function showCheckout() {
+        document.getElementById('cart-footer').style.display = 'none';
+        document.getElementById('cart-items-list').style.display = 'none';
+        document.getElementById('checkout-section').classList.add('visible');
+    }
+
+    function hideCheckout() {
+        document.getElementById('cart-footer').style.display = 'block';
+        document.getElementById('cart-items-list').style.display = 'block';
+        document.getElementById('checkout-section').classList.remove('visible');
+    }
+
+    function processOrder(e) {
         e.preventDefault();
-        alert('Заказ успешно оформлен! Мы свяжемся с вами.');
+        alert('Thank you! Your order has been placed successfully.');
         cart = [];
-        updateUI();
-        showPage('home');
+        updateCart();
+        toggleCart();
     }
 
-    // Запуск
+    // Initialize
     initProducts();
-    updateUI();
+    updateCart();
 </script>
 
 </body>
