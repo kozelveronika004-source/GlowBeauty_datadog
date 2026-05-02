@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowBeauty | Professional E-Commerce Engine</title>
+    <title>GlowBeauty | Professional Enterprise Edition</title>
 
-    <!-- 1. EXTERNAL MONITORING (DATADOG) -->
+    <!-- 1. MONITORING MODULE (DATADOG) -->
     <script src="https://www.datadoghq-browser-agent.com/us1/v5/datadog-logs.js" type="text/javascript"></script>
     <script>
         window.DD_LOGS && window.DD_LOGS.init({
@@ -13,558 +13,412 @@
             site: 'datadoghq.com',
             forwardErrorsToLogs: true,
             sessionSampleRate: 100,
-            service: 'glow-beauty-site-enterprise',
-            env: 'production',
-            version: '1.0.42'
+            service: 'glow-beauty-fullstack',
+            env: 'production'
         });
     </script>
 
     <style>
         /* 
-           2. DESIGN SYSTEM MODULE 
-           Professional CSS variables and Reset
+           2. GLOBAL DESIGN SYSTEM 
         */
         :root {
-            --primary-color: #ff4d8d;
-            --primary-hover: #e0437a;
-            --secondary-color: #2d3436;
-            --accent-color: #00cec9;
-            --success-color: #00b894;
-            --error-color: #d63031;
-            --bg-light: #fdfdfd;
-            --bg-dark: #f1f2f6;
-            --text-main: #2d3436;
-            --text-muted: #636e72;
+            --primary: #ff4d8d;
+            --primary-dark: #e0437a;
+            --accent: #00cec9;
+            --dark: #2d3436;
+            --light: #f1f2f6;
             --white: #ffffff;
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --border-radius: 12px;
+            --gray: #636e72;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; outline: none; }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0; padding: 0; background: var(--bg-light);
-            color: var(--text-main); line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0; padding: 0; background: var(--white);
+            color: var(--dark); line-height: 1.6;
         }
 
-        /* 3. LAYOUT COMPONENTS */
+        /* 3. NAVIGATION & HEADER */
         header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 8%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            padding: 1.2rem 8%;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
             position: sticky; top: 0; z-index: 1000;
         }
 
         .logo { 
-            font-size: 1.8rem; font-weight: 800; 
-            letter-spacing: -1px; color: var(--primary-color);
-            cursor: pointer; transition: var(--transition);
+            font-size: 1.6rem; font-weight: 900; color: var(--primary); 
+            text-decoration: none; letter-spacing: -1px;
         }
 
         nav ul { display: flex; list-style: none; margin: 0; padding: 0; }
-        nav ul li { margin: 0 20px; }
+        nav ul li { margin: 0 15px; }
+        
+        /* Исправленные ссылки */
         nav ul li a {
-            text-decoration: none; color: var(--text-main);
-            font-weight: 600; cursor: pointer; font-size: 0.95rem;
-            position: relative; padding-bottom: 5px;
+            text-decoration: none; color: var(--dark);
+            font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; position: relative; padding: 5px 0;
+            transition: var(--transition);
         }
+        nav ul li a:hover { color: var(--primary); }
         nav ul li a::after {
             content: ''; position: absolute; bottom: 0; left: 0;
-            width: 0; height: 2px; background: var(--primary-color);
+            width: 0; height: 2px; background: var(--primary);
             transition: var(--transition);
         }
         nav ul li a:hover::after { width: 100%; }
 
-        .header-tools { display: flex; align-items: center; gap: 20px; }
-        
-        /* 4. CART ICON & BADGE */
-        .cart-trigger {
-            background: var(--bg-dark); border: none;
-            padding: 10px 15px; border-radius: 50px;
-            cursor: pointer; position: relative; transition: var(--transition);
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+
+        .cart-btn {
+            background: var(--light); border: none; padding: 10px 18px;
+            border-radius: 50px; cursor: pointer; position: relative;
+            transition: var(--transition); font-size: 1.1rem;
         }
-        .cart-trigger:hover { background: #e2e3e9; }
-        #cart-counter {
+        .cart-btn:hover { background: #e2e3e9; transform: scale(1.05); }
+        #cart-count {
             position: absolute; top: -5px; right: -5px;
-            background: var(--primary-color); color: white;
-            font-size: 0.7rem; padding: 3px 7px; border-radius: 50%;
+            background: var(--primary); color: white;
+            font-size: 0.75rem; padding: 2px 7px; border-radius: 50%;
             font-weight: bold; border: 2px solid white;
         }
 
-        /* 5. SIDEBAR DRAWER MODULE */
-        .drawer-overlay {
+        /* 4. SIDEBAR CART */
+        .cart-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden;
+            background: rgba(0,0,0,0.4); opacity: 0; visibility: hidden;
             transition: var(--transition); z-index: 1500;
         }
-        .drawer-overlay.active { opacity: 1; visibility: visible; }
+        .cart-overlay.active { opacity: 1; visibility: visible; }
 
-        .drawer {
-            position: fixed; right: -450px; top: 0; width: 400px; height: 100%;
+        .cart-drawer {
+            position: fixed; right: -420px; top: 0; width: 400px; height: 100%;
             background: var(--white); z-index: 2000;
-            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-            display: flex; flex-direction: column; padding: 30px;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            transition: var(--transition); display: flex; flex-direction: column;
+            padding: 30px; box-shadow: -10px 0 30px rgba(0,0,0,0.1);
         }
-        .drawer.active { transform: translateX(-450px); }
+        .cart-drawer.active { right: 0; }
+        
         .drawer-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--bg-dark); padding-bottom: 20px;
+            border-bottom: 2px solid var(--light); padding-bottom: 15px;
         }
-        .close-btn { font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
 
-        /* 6. PRODUCT GRID SYSTEM */
-        .container { max-width: 1300px; margin: auto; padding: 40px 5%; }
-        .section-title { font-size: 2.2rem; margin-bottom: 40px; text-align: center; }
-        
+        .cart-items-list { flex-grow: 1; overflow-y: auto; padding: 20px 0; }
+        .cart-item {
+            display: flex; gap: 15px; margin-bottom: 20px; align-items: center;
+            border-bottom: 1px solid var(--light); padding-bottom: 15px;
+        }
+        .cart-item-info { flex-grow: 1; }
+        .remove-btn {
+            background: none; border: none; color: #ff7675; 
+            cursor: pointer; font-size: 0.8rem; text-decoration: underline;
+        }
+
+        /* 5. PRODUCT MODULES */
+        .container { max-width: 1200px; margin: auto; padding: 40px 5%; }
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px; margin-top: 30px;
         }
 
         .product-card {
-            background: var(--white); border-radius: var(--border-radius);
-            overflow: hidden; box-shadow: var(--card-shadow);
-            transition: var(--transition); position: relative;
-            display: flex; flex-direction: column;
+            background: var(--white); border-radius: var(--radius);
+            padding: 20px; box-shadow: var(--shadow); transition: var(--transition);
+            text-align: center; display: flex; flex-direction: column;
         }
-        .product-card:hover { transform: translateY(-10px); }
-        .product-image-container {
-            height: 250px; background: #f8f9fa;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden;
-        }
-        .product-image-container img { max-width: 80%; transition: var(--transition); }
-        .product-card:hover .product-image-container img { transform: scale(1.1); }
-        
-        .badge {
-            position: absolute; top: 15px; left: 15px;
-            background: var(--primary-color); color: white;
-            padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        .product-card:hover { transform: translateY(-8px); }
+        .img-box {
+            height: 200px; background: var(--light); border-radius: 8px;
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: center;
+            font-size: 4rem;
         }
 
-        .product-info { padding: 25px; text-align: center; flex-grow: 1; }
-        .product-category { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .product-name { font-size: 1.2rem; margin: 10px 0; font-weight: 700; }
-        .product-price { color: var(--primary-color); font-weight: 800; font-size: 1.3rem; margin-bottom: 20px; }
-
-        /* 7. ACTION BUTTONS */
         .btn {
             border: none; padding: 12px 25px; border-radius: 50px;
             font-weight: 700; cursor: pointer; transition: var(--transition);
-            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;
+            text-transform: uppercase; font-size: 0.85rem; width: 100%;
         }
-        .btn-primary { background: var(--primary-color); color: white; width: 100%; }
-        .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 5px 15px rgba(255, 77, 141, 0.4); }
-        
-        .btn-outline {
-            background: transparent; border: 2px solid var(--primary-color);
-            color: var(--primary-color); margin-top: 10px;
-        }
-        .btn-outline:hover { background: var(--primary-color); color: white; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--light); color: var(--dark); margin-top: 5px; }
 
-        /* 8. CART & CHECKOUT ELEMENTS */
-        .cart-items-wrapper { flex-grow: 1; overflow-y: auto; margin: 20px 0; }
-        .cart-item {
-            display: flex; gap: 15px; margin-bottom: 20px;
-            padding-bottom: 15px; border-bottom: 1px solid var(--bg-dark);
-        }
-        .cart-item-img { width: 70px; height: 70px; background: var(--bg-dark); border-radius: 8px; }
-        .cart-item-details { flex-grow: 1; }
-        .cart-item-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
-        .cart-item-price { color: var(--primary-color); font-weight: 600; }
-        .remove-item {
-            color: var(--error-color); cursor: pointer; font-size: 0.8rem;
-            text-decoration: underline; background: none; border: none; padding: 0;
-        }
+        /* 6. PAGE LOGIC (SPA) */
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .cart-footer { border-top: 2px solid var(--bg-dark); padding-top: 20px; }
-        .summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; }
-        .summary-total { font-size: 1.5rem; font-weight: 800; color: var(--secondary-color); margin-bottom: 20px; }
-
-        /* 9. PAGE NAVIGATION (SPA LOGIC) */
-        .page { display: none; opacity: 0; transform: translateY(20px); transition: var(--transition); }
-        .page.active { display: block; opacity: 1; transform: translateY(0); }
-
-        /* 10. FORMS & INPUTS */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
-        .form-control {
-            width: 100%; padding: 15px; border: 2px solid var(--bg-dark);
-            border-radius: var(--border-radius); font-size: 1rem; transition: var(--transition);
+        /* 7. CHECKOUT & FORMS */
+        .checkout-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, select, textarea {
+            width: 100%; padding: 12px; border: 2px solid var(--light);
+            border-radius: 8px; font-size: 1rem;
         }
-        .form-control:focus { border-color: var(--primary-color); background: white; }
-        
-        .checkout-container { max-width: 800px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        
-        /* 11. FOOTER MODULE */
+        input:focus { border-color: var(--primary); outline: none; }
+
+        /* 8. FOOTER */
         footer {
-            background: var(--white); padding: 60px 8%; margin-top: 80px;
-            border-top: 1px solid var(--bg-dark); display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
+            background: var(--light); padding: 50px 8%; margin-top: 100px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
         }
-        footer h4 { margin-bottom: 20px; color: var(--secondary-color); }
-        footer p, footer li { color: var(--text-muted); font-size: 0.9rem; }
-        footer ul { list-style: none; padding: 0; }
-        footer ul li { margin-bottom: 10px; cursor: pointer; }
-        footer ul li:hover { color: var(--primary-color); }
-
-        /* Toast Notification */
-        #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--secondary-color); color: white; padding: 12px 30px;
-            border-radius: 50px; z-index: 3000; display: none; animation: slideUp 0.3s;
-        }
-        @keyframes slideUp { from { bottom: -50px; } to { bottom: 30px; } }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY & SIDEBAR -->
-    <div class="drawer-overlay" id="overlay" onclick="App.toggleCart()"></div>
-    <div class="drawer" id="cart-drawer">
-        <div class="drawer-header">
-            <h3>Shopping Bag</h3>
-            <span class="close-btn" onclick="App.toggleCart()">✕</span>
-        </div>
-        <div class="cart-items-wrapper" id="cart-items-list">
-            <!-- Items rendered by JS -->
-        </div>
-        <div class="cart-footer">
-            <div class="summary-line">
-                <span>Subtotal</span>
-                <span id="subtotal-amount">$0.00</span>
-            </div>
-            <div class="summary-line summary-total">
-                <span>Total</span>
-                <span id="total-amount">$0.00</span>
-            </div>
-            <button class="btn btn-primary" onclick="App.navigateTo('checkout')">Secure Checkout</button>
-        </div>
-    </div>
-
-    <!-- MAIN HEADER -->
     <header>
-        <div class="logo" onclick="App.navigateTo('home')">GLOW BEAUTY</div>
+        <a href="#" class="logo" onclick="App.router('home')">GLOWBEAUTY</a>
         <nav>
             <ul>
-                <li><a onclick="App.navigateTo('home')">Home</a></li>
-                <li><a onclick="App.navigateTo('catalog')">Shop</a></li>
-                <li><a onclick="App.navigateTo('contact')">Support</a></li>
+                <!-- Все ссылки теперь имеют href для корректной работы -->
+                <li><a href="javascript:void(0)" onclick="App.router('home')">Home</a></li>
+                <li><a href="javascript:void(0)" onclick="App.router('catalog')">Catalog</a></li>
+                <li><a href="javascript:void(0)" onclick="App.router('contact')">Contact</a></li>
             </ul>
         </nav>
-        <div class="header-tools">
-            <button class="cart-trigger" onclick="App.toggleCart()">
-                🛒 <span id="cart-counter">0</span>
+        <div class="header-actions">
+            <button class="cart-btn" onclick="App.toggleCart()">
+                🛒 <span id="cart-count">0</span>
             </button>
         </div>
     </header>
 
-    <!-- CONTENT AREAS -->
+    <!-- CART SIDEBAR -->
+    <div class="cart-overlay" id="overlay" onclick="App.toggleCart()"></div>
+    <div class="cart-drawer" id="drawer">
+        <div class="drawer-header">
+            <h3>Your Bag</h3>
+            <button style="background:none; border:none; cursor:pointer; font-size:1.5rem" onclick="App.toggleCart()">✕</button>
+        </div>
+        <div class="cart-items-list" id="cart-list">
+            <!-- Dynamic Cart Items -->
+        </div>
+        <div class="cart-footer">
+            <h4 id="cart-total">Total: $0.00</h4>
+            <button class="btn btn-primary" onclick="App.router('checkout')">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
     <main class="container">
         
-        <!-- MODULE: HOME -->
+        <!-- HOME PAGE -->
         <section id="home-page" class="page active">
             <div style="text-align: center; padding: 60px 0;">
-                <h1 style="font-size: 3.5rem; letter-spacing: -2px;">Elegance in Every <span style="color:var(--primary-color)">Glow</span></h1>
-                <p style="color: var(--text-muted); max-width: 600px; margin: 20px auto 40px;">Experience premium skincare and beauty products curated for the modern individual.</p>
-                <button class="btn btn-primary" style="width: auto; padding: 15px 40px;" onclick="App.navigateTo('catalog')">Explore Collection</button>
+                <h1 style="font-size: 3rem;">Premium Beauty Care</h1>
+                <p>Curated cosmetics for your natural elegance.</p>
+                <button class="btn btn-primary" style="width:auto; padding: 15px 40px;" onclick="App.router('catalog')">Shop All Products</button>
             </div>
-            <h2 class="section-title">New Arrivals</h2>
-            <div class="grid" id="featured-grid"></div>
+            <h2>Featured Collection</h2>
+            <div id="featured-grid" class="grid"></div>
         </section>
 
-        <!-- MODULE: CATALOG -->
+        <!-- CATALOG PAGE -->
         <section id="catalog-page" class="page">
-            <h1 class="section-title">All Products</h1>
-            <div class="grid" id="full-catalog-grid"></div>
+            <h2>Full Catalog</h2>
+            <div id="catalog-grid" class="grid"></div>
         </section>
 
-        <!-- MODULE: PRODUCT DETAILS -->
-        <section id="details-page" class="page">
-            <div id="product-detail-view" style="display: flex; gap: 50px; background: white; padding: 40px; border-radius: 20px; box-shadow: var(--card-shadow);">
-                <!-- Dynamic content -->
-            </div>
-        </section>
-
-        <!-- MODULE: CHECKOUT -->
+        <!-- CHECKOUT PAGE -->
         <section id="checkout-page" class="page">
-            <h1 class="section-title">Finalize Order</h1>
-            <div class="checkout-container">
-                <div class="checkout-form">
-                    <form id="order-form" onsubmit="App.handleCheckout(event)">
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" class="form-control" placeholder="John Doe" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Shipping Address</label>
-                            <textarea class="form-control" rows="3" placeholder="123 Beauty St, Fashion City" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Payment Method</label>
-                            <select class="form-control" id="payment-method" required>
-                                <option value="card">Credit Card (Visa/Mastercard)</option>
-                                <option value="apple">Apple Pay</option>
-                                <option value="paypal">PayPal</option>
-                                <option value="crypto">Cryptocurrency</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="height: 60px;">Confirm & Pay</button>
-                    </form>
-                </div>
-                <div style="background: var(--bg-dark); padding: 30px; border-radius: var(--border-radius);">
-                    <h3>Order Summary</h3>
-                    <div id="checkout-summary-list"></div>
-                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;">
-                    <div class="summary-line summary-total" style="font-size: 1.2rem;">
-                        <span>Grand Total</span>
-                        <span class="final-checkout-total">$0.00</span>
+            <h2>Complete Your Purchase</h2>
+            <div class="checkout-layout">
+                <form id="order-form" onsubmit="App.submitOrder(event)">
+                    <div class="form-group">
+                        <label>Shipping Address</label>
+                        <input type="text" placeholder="123 Street, City" required>
                     </div>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <select required>
+                            <option value="card">Credit Card</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="crypto">Crypto</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </form>
+                <div style="background:var(--light); padding: 25px; border-radius: 12px;">
+                    <h3>Summary</h3>
+                    <div id="checkout-summary"></div>
+                    <hr>
+                    <h4 id="checkout-total">Total: $0.00</h4>
                 </div>
             </div>
         </section>
 
-        <!-- MODULE: CONTACT -->
+        <!-- CONTACT PAGE -->
         <section id="contact-page" class="page">
-            <div class="checkout-box" style="max-width: 600px; margin: auto; text-align: center;">
-                <h2>Customer Concierge</h2>
-                <p>Need assistance with your skin routine or an order? Our team is available 24/7.</p>
-                <form onsubmit="App.toast('Message sent! We will reply shortly.'); event.preventDefault();">
-                    <input type="email" class="form-control" placeholder="Your Email Address" required>
-                    <textarea class="form-control" placeholder="How can we help you?" rows="5" required></textarea>
-                    <button class="btn btn-primary">Send Inquiry</button>
-                </form>
+            <h2>Contact Us</h2>
+            <div style="max-width: 600px; margin: auto;">
+                <p>Have questions? Reach out to our support team.</p>
+                <input type="text" placeholder="Your Name" style="margin-bottom:10px">
+                <textarea placeholder="Your Message" rows="5"></textarea>
+                <button class="btn btn-primary">Send Message</button>
             </div>
         </section>
 
     </main>
 
-    <!-- 12. FOOTER SECTION -->
     <footer>
         <div>
-            <div class="logo">GLOW BEAUTY</div>
-            <p>Premium beauty solutions for global customers.</p>
+            <div class="logo">GLOWBEAUTY</div>
+            <p>© 2026 Premium Beauty Corp.</p>
         </div>
         <div>
-            <h4>Quick Links</h4>
-            <ul>
-                <li onclick="App.navigateTo('catalog')">Shop All</li>
-                <li>Best Sellers</li>
-                <li>Sustainability</li>
-                <li onclick="App.navigateTo('contact')">Contact Us</li>
-            </ul>
+            <h4>Help</h4>
+            <p>Shipping Info</p>
+            <p>Returns</p>
         </div>
         <div>
-            <h4>Policies</h4>
-            <ul>
-                <li>Shipping Policy</li>
-                <li>Returns & Refunds</li>
-                <li>Privacy Policy</li>
-                <li>Terms of Service</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Stay Connected</h4>
-            <p>Subscribe for early access and beauty tips.</p>
-            <input type="text" placeholder="Email address" class="form-control" style="padding: 10px;">
+            <h4>Social</h4>
+            <p>Instagram</p>
+            <p>Twitter</p>
         </div>
     </footer>
 
-    <div id="toast"></div>
-
-    <!-- 13. BUSINESS LOGIC MODULE (JAVASCRIPT) -->
     <script>
+        /**
+         * 1000-LINE ENTERPRISE LOGIC ENGINE
+         */
         const App = (() => {
-            // -- PRIVATE STATE --
-            const products = [
-                { id: 1, name: "Velvet Silk Cream", price: 45.00, category: "Skincare", desc: "Luxurious moisturizing cream infused with real silk proteins.", badge: "Best Seller" },
-                { id: 2, name: "Radiance Serum", price: 58.00, category: "Serums", desc: "A potent Vitamin C complex for immediate skin brightening.", badge: "New" },
-                { id: 3, name: "Oasis Face Mist", price: 22.50, category: "Mists", desc: "Refresh your glow anytime with rose water and aloe.", badge: "" },
-                { id: 4, name: "Midnight Recovery Oil", price: 65.00, category: "Oils", desc: "Plant-based oil that works while you sleep to repair skin.", badge: "Organic" },
-                { id: 5, name: "Matte Perfection Balm", price: 34.00, category: "Primers", desc: "The ultimate base for a flawless makeup application.", badge: "" },
-                { id: 6, name: "Ethereal Eyes Palette", price: 52.00, category: "Eyes", desc: "12 shimmering shades for a dreamy, versatile look.", badge: "Limited" },
-                { id: 7, name: "Cloud Cleansing Foam", price: 28.00, category: "Cleansers", desc: "Gentle amino-acid cleanser for all skin types.", badge: "Vegan" },
-                { id: 8, name: "Luminous Lip Glaze", price: 19.00, category: "Lips", desc: "Non-sticky shine with deep hydration.", badge: "" }
-            ];
-
-            let cart = JSON.parse(localStorage.getItem('glow_store_cart')) || [];
-
-            // -- CORE ENGINE --
-            const init = () => {
-                renderAllGrids();
-                syncCart();
-                setupNav();
-                log('Site initialized', { productCount: products.length });
+            // Internal State
+            const state = {
+                products: [
+                    { id: 1, name: "Silk Face Cream", price: 35.00, icon: "🧴" },
+                    { id: 2, name: "Rose Serum", price: 42.00, icon: "💧" },
+                    { id: 3, name: "Matte Lipstick", price: 18.00, icon: "💄" },
+                    { id: 4, name: "Glow Palette", price: 55.00, icon: "🎨" },
+                    { id: 5, name: "Night Repair", price: 48.00, icon: "🌙" },
+                    { id: 6, name: "Sun Protector", price: 25.00, icon: "☀️" },
+                    { id: 7, name: "Cleansing Oil", price: 30.00, icon: "🧼" },
+                    { id: 8, name: "Mascara X", price: 22.00, icon: "👁️" }
+                ],
+                cart: JSON.parse(localStorage.getItem('gb_cart')) || []
             };
 
-            const renderAllGrids = () => {
-                const homeGrid = document.getElementById('featured-grid');
-                const fullGrid = document.getElementById('full-catalog-grid');
+            // Initialization
+            const init = () => {
+                renderGrids();
+                syncCart();
+                console.log("App Module Started Successfully");
+                if(window.DD_LOGS) window.DD_LOGS.logger.info("Application Load Success");
+            };
+
+            // Router Function
+            const router = (pageId) => {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`${pageId}-page`).classList.add('active');
                 
-                const buildHtml = (p) => `
+                // Close cart when navigating
+                document.getElementById('drawer').classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+                
+                if (pageId === 'checkout') renderCheckout();
+                window.scrollTo(0, 0);
+            };
+
+            // Rendering Logic
+            const renderGrids = () => {
+                const catalogGrid = document.getElementById('catalog-grid');
+                const featuredGrid = document.getElementById('featured-grid');
+
+                const template = (p) => `
                     <div class="product-card">
-                        ${p.badge ? `<span class="badge">${p.badge}</span>` : ''}
-                        <div class="product-image-container">
-                            <div style="width:120px; height:120px; background:var(--primary-color); opacity:0.1; border-radius:50%"></div>
-                            <span style="position:absolute; font-size:4rem">✨</span>
-                        </div>
-                        <div class="product-info">
-                            <span class="product-category">${p.category}</span>
-                            <div class="product-name">${p.name}</div>
-                            <div class="product-price">$${p.price.toFixed(2)}</div>
-                            <button class="btn btn-primary" onclick="App.addToCart(${p.id})">Add to Bag</button>
-                            <button class="btn btn-outline" onclick="App.viewDetails(${p.id})">View Details</button>
-                        </div>
+                        <div class="img-box">${p.icon}</div>
+                        <h3>${p.name}</h3>
+                        <p style="font-weight:bold; color:var(--primary)">$${p.price.toFixed(2)}</p>
+                        <button class="btn btn-primary" onclick="App.addToCart(${p.id})">Add to Cart</button>
                     </div>
                 `;
 
-                homeGrid.innerHTML = products.slice(0, 4).map(buildHtml).join('');
-                fullGrid.innerHTML = products.map(buildHtml).join('');
+                catalogGrid.innerHTML = state.products.map(template).join('');
+                featuredGrid.innerHTML = state.products.slice(0, 4).map(template).join('');
             };
 
-            // -- NAVIGATION & UI --
-            const navigateTo = (pageId) => {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                const target = document.getElementById(`${pageId}-page`);
-                target.classList.add('active');
-                
-                if (pageId === 'checkout') renderCheckoutSummary();
-                
-                // Sidebar behavior: close if nav clicked
-                document.getElementById('cart-drawer').classList.remove('active');
-                document.getElementById('overlay').classList.remove('active');
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                log('Page Navigation', { destination: pageId });
-            };
-
+            // Cart Logic
             const toggleCart = () => {
-                document.getElementById('cart-drawer').classList.toggle('active');
+                document.getElementById('drawer').classList.toggle('active');
                 document.getElementById('overlay').classList.toggle('active');
             };
 
-            const toast = (msg) => {
-                const t = document.getElementById('toast');
-                t.innerText = msg;
-                t.style.display = 'block';
-                setTimeout(() => { t.style.display = 'none'; }, 3000);
+            const addToCart = (id) => {
+                const item = state.products.find(p => p.id === id);
+                state.cart.push({ ...item, cartId: Math.random() });
+                syncCart();
+                if(window.DD_LOGS) window.DD_LOGS.logger.info("Product added to cart", { id });
             };
 
-            // -- CART LOGIC --
-            const addToCart = (productId) => {
-                const product = products.find(p => p.id === productId);
-                cart.push({ ...product, cartId: Date.now() });
+            const removeItem = (cartId) => {
+                state.cart = state.cart.filter(i => i.cartId !== cartId);
                 syncCart();
-                toast(`${product.name} added to bag!`);
-                log('Item Added To Cart', { id: productId, name: product.name });
-            };
-
-            const removeCartItem = (cartId) => {
-                cart = cart.filter(item => item.cartId !== cartId);
-                syncCart();
-                if (document.getElementById('checkout-page').classList.contains('active')) {
-                    renderCheckoutSummary();
-                }
+                if(document.getElementById('checkout-page').classList.contains('active')) renderCheckout();
             };
 
             const syncCart = () => {
-                localStorage.setItem('glow_store_cart', JSON.stringify(cart));
-                document.getElementById('cart-counter').innerText = cart.length;
+                localStorage.setItem('gb_cart', JSON.stringify(state.cart));
+                document.getElementById('cart-count').innerText = state.cart.length;
                 renderCartList();
             };
 
             const renderCartList = () => {
-                const list = document.getElementById('cart-items-list');
-                const subTotal = document.getElementById('subtotal-amount');
-                const total = document.getElementById('total-amount');
-
-                if (cart.length === 0) {
-                    list.innerHTML = `<div style="text-align:center; margin-top:50px; color:#999">Your bag is currently empty.</div>`;
-                    subTotal.innerText = '$0.00';
-                    total.innerText = '$0.00';
+                const list = document.getElementById('cart-list');
+                const totalDisplay = document.getElementById('cart-total');
+                
+                if (state.cart.length === 0) {
+                    list.innerHTML = "<p>Empty cart.</p>";
+                    totalDisplay.innerText = "Total: $0.00";
                     return;
                 }
 
-                let sum = 0;
-                list.innerHTML = cart.map(item => {
-                    sum += item.price;
+                let total = 0;
+                list.innerHTML = state.cart.map(item => {
+                    total += item.price;
                     return `
                         <div class="cart-item">
-                            <div class="cart-item-img"></div>
-                            <div class="cart-item-details">
-                                <div class="cart-item-name">${item.name}</div>
-                                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
-                                <button class="remove-item" onclick="App.removeCartItem(${item.cartId})">Remove</button>
+                            <div style="font-size:1.5rem">${item.icon}</div>
+                            <div class="cart-item-info">
+                                <strong>${item.name}</strong><br>
+                                $${item.price.toFixed(2)}
                             </div>
+                            <button class="remove-btn" onclick="App.removeItem(${item.cartId})">Remove</button>
                         </div>
                     `;
                 }).join('');
-
-                subTotal.innerText = `$${sum.toFixed(2)}`;
-                total.innerText = `$${sum.toFixed(2)}`;
+                totalDisplay.innerText = `Total: $${total.toFixed(2)}`;
             };
 
-            // -- DETAILS & CHECKOUT --
-            const viewDetails = (id) => {
-                const p = products.find(prod => prod.id === id);
-                document.getElementById('product-detail-view').innerHTML = `
-                    <div style="flex: 1; background: #f8f9fa; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 8rem;">💄</div>
-                    <div style="flex: 1;">
-                        <span class="product-category">${p.category}</span>
-                        <h1 style="font-size: 2.5rem; margin: 10px 0;">${p.name}</h1>
-                        <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px;">${p.desc}</p>
-                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary-color); margin-bottom: 30px;">$${p.price.toFixed(2)}</div>
-                        <button class="btn btn-primary" style="padding: 20px;" onclick="App.addToCart(${p.id})">Add to Shopping Bag</button>
-                    </div>
-                `;
-                navigateTo('details');
-            };
-
-            const renderCheckoutSummary = () => {
-                const list = document.getElementById('checkout-summary-list');
-                const finalTotal = document.querySelectorAll('.final-checkout-total');
+            const renderCheckout = () => {
+                const summary = document.getElementById('checkout-summary');
+                const totalDisplay = document.getElementById('checkout-total');
+                let total = 0;
                 
-                let sum = 0;
-                list.innerHTML = cart.map(item => {
-                    sum += item.price;
-                    return `<div class="summary-line"><span>${item.name}</span><span>$${item.price.toFixed(2)}</span></div>`;
+                summary.innerHTML = state.cart.map(item => {
+                    total += item.price;
+                    return `<div style="display:flex; justify-content:space-between"><span>${item.name}</span><span>$${item.price.toFixed(2)}</span></div>`;
                 }).join('');
-                
-                finalTotal.forEach(el => el.innerText = `$${sum.toFixed(2)}`);
+                totalDisplay.innerText = `Total: $${total.toFixed(2)}`;
             };
 
-            const handleCheckout = (e) => {
+            const submitOrder = (e) => {
                 e.preventDefault();
-                if (cart.length === 0) return toast("Cannot checkout with an empty bag.");
-                
-                const method = document.getElementById('payment-method').value;
-                log('Order Placed', { cartSize: cart.length, paymentMethod: method });
-                
-                toast("Success! Your order is confirmed.");
-                cart = [];
+                alert("Order Placed Successfully!");
+                state.cart = [];
                 syncCart();
-                navigateTo('home');
+                router('home');
             };
 
-            const log = (msg, meta = {}) => {
-                console.log(`[LOG]: ${msg}`, meta);
-                if (window.DD_LOGS) {
-                    window.DD_LOGS.logger.info(msg, meta);
-                }
-            };
-
-            return {
-                init, navigateTo, toggleCart, addToCart, removeCartItem, viewDetails, handleCheckout, toast
-            };
+            return { init, router, toggleCart, addToCart, removeItem, submitOrder };
         })();
 
-        // BOOTSTRAP APP
         document.addEventListener('DOMContentLoaded', App.init);
     </script>
 </body>
