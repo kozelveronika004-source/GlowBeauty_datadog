@@ -3,313 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowBeauty | Premium Store</title>
+    <title>GlowBeauty | Professional E-Commerce Engine</title>
+
+    <!-- 1. EXTERNAL MONITORING (DATADOG) -->
+    <script src="https://www.datadoghq-browser-agent.com/us1/v5/datadog-logs.js" type="text/javascript"></script>
+    <script>
+        window.DD_LOGS && window.DD_LOGS.init({
+            clientToken: 'pubf5f92c49b7fcf5ea84e77f7f817f2930',
+            site: 'datadoghq.com',
+            forwardErrorsToLogs: true,
+            sessionSampleRate: 100,
+            service: 'glow-beauty-site-enterprise',
+            env: 'production',
+            version: '1.0.42'
+        });
+    </script>
+
     <style>
+        /* 
+           2. DESIGN SYSTEM MODULE 
+           Professional CSS variables and Reset
+        */
         :root {
-            --primary: #ff4d8d;
-            --secondary: #2d3436;
-            --light: #f9f9f9;
+            --primary-color: #ff4d8d;
+            --primary-hover: #e0437a;
+            --secondary-color: #2d3436;
+            --accent-color: #00cec9;
+            --success-color: #00b894;
+            --error-color: #d63031;
+            --bg-light: #fdfdfd;
+            --bg-dark: #f1f2f6;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
             --white: #ffffff;
-            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 12px;
         }
 
+        * { box-sizing: border-box; outline: none; }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            background-color: var(--light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0; padding: 0; background: var(--bg-light);
+            color: var(--text-main); line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Navigation */
+        /* 3. LAYOUT COMPONENTS */
         header {
-            background: var(--white);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 1000;
         }
 
-        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
-
-        .cart-icon-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            position: relative;
+        .logo { 
+            font-size: 1.8rem; font-weight: 800; 
+            letter-spacing: -1px; color: var(--primary-color);
+            cursor: pointer; transition: var(--transition);
         }
 
-        .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background: var(--primary);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 50%;
-            font-size: 0.7rem;
+        nav ul { display: flex; list-style: none; margin: 0; padding: 0; }
+        nav ul li { margin: 0 20px; }
+        nav ul li a {
+            text-decoration: none; color: var(--text-main);
+            font-weight: 600; cursor: pointer; font-size: 0.95rem;
+            position: relative; padding-bottom: 5px;
         }
-
-        /* Sidebar Cart */
-        .cart-sidebar {
-            position: fixed;
-            right: -400px;
-            top: 0;
-            width: 350px;
-            height: 100%;
-            background: var(--white);
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-            transition: 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
+        nav ul li a::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 0; height: 2px; background: var(--primary-color);
+            transition: var(--transition);
         }
+        nav ul li a:hover::after { width: 100%; }
 
-        .cart-sidebar.active { right: 0; }
-
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-
-        .close-cart { cursor: pointer; font-size: 1.5rem; }
-
-        .cart-items-list {
-            flex: 1;
-            overflow-y: auto;
-            margin: 20px 0;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #fafafa;
-            border-radius: 8px;
-        }
-
-        /* Checkout Form inside Cart */
-        #checkout-section {
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            display: none;
-        }
-
-        #checkout-section.visible { display: block; }
-
-        /* Products Grid */
-        .container { padding: 2rem 5%; }
+        .header-tools { display: flex; align-items: center; gap: 20px; }
         
-        .products-grid {
+        /* 4. CART ICON & BADGE */
+        .cart-trigger {
+            background: var(--bg-dark); border: none;
+            padding: 10px 15px; border-radius: 50px;
+            cursor: pointer; position: relative; transition: var(--transition);
+        }
+        .cart-trigger:hover { background: #e2e3e9; }
+        #cart-counter {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--primary-color); color: white;
+            font-size: 0.7rem; padding: 3px 7px; border-radius: 50%;
+            font-weight: bold; border: 2px solid white;
+        }
+
+        /* 5. SIDEBAR DRAWER MODULE */
+        .drawer-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden;
+            transition: var(--transition); z-index: 1500;
+        }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+
+        .drawer {
+            position: fixed; right: -450px; top: 0; width: 400px; height: 100%;
+            background: var(--white); z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            display: flex; flex-direction: column; padding: 30px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+        }
+        .drawer.active { transform: translateX(-450px); }
+        .drawer-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--bg-dark); padding-bottom: 20px;
+        }
+        .close-btn { font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+
+        /* 6. PRODUCT GRID SYSTEM */
+        .container { max-width: 1300px; margin: auto; padding: 40px 5%; }
+        .section-title { font-size: 2.2rem; margin-bottom: 40px; text-align: center; }
+        
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
         }
 
-        .card {
-            background: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: 0.3s;
-            box-shadow: var(--shadow);
-            text-align: center;
+        .product-card {
+            background: var(--white); border-radius: var(--border-radius);
+            overflow: hidden; box-shadow: var(--card-shadow);
+            transition: var(--transition); position: relative;
+            display: flex; flex-direction: column;
         }
-
-        .card:hover { transform: translateY(-5px); }
-        .card-img { height: 180px; background: #eee; }
-        .card-content { padding: 1.2rem; }
-        .price { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
-
-        /* Buttons & Inputs */
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
+        .product-card:hover { transform: translateY(-10px); }
+        .product-image-container {
+            height: 250px; background: #f8f9fa;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
         }
-
-        .btn-remove { background: #ff7675; width: auto; padding: 5px 10px; font-size: 0.8rem; }
+        .product-image-container img { max-width: 80%; transition: var(--transition); }
+        .product-card:hover .product-image-container img { transform: scale(1.1); }
         
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .badge {
+            position: absolute; top: 15px; left: 15px;
+            background: var(--primary-color); color: white;
+            padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
         }
 
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4);
-            display: none;
-            z-index: 900;
+        .product-info { padding: 25px; text-align: center; flex-grow: 1; }
+        .product-category { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .product-name { font-size: 1.2rem; margin: 10px 0; font-weight: 700; }
+        .product-price { color: var(--primary-color); font-weight: 800; font-size: 1.3rem; margin-bottom: 20px; }
+
+        /* 7. ACTION BUTTONS */
+        .btn {
+            border: none; padding: 12px 25px; border-radius: 50px;
+            font-weight: 700; cursor: pointer; transition: var(--transition);
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;
         }
-        .overlay.active { display: block; }
+        .btn-primary { background: var(--primary-color); color: white; width: 100%; }
+        .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 5px 15px rgba(255, 77, 141, 0.4); }
+        
+        .btn-outline {
+            background: transparent; border: 2px solid var(--primary-color);
+            color: var(--primary-color); margin-top: 10px;
+        }
+        .btn-outline:hover { background: var(--primary-color); color: white; }
+
+        /* 8. CART & CHECKOUT ELEMENTS */
+        .cart-items-wrapper { flex-grow: 1; overflow-y: auto; margin: 20px 0; }
+        .cart-item {
+            display: flex; gap: 15px; margin-bottom: 20px;
+            padding-bottom: 15px; border-bottom: 1px solid var(--bg-dark);
+        }
+        .cart-item-img { width: 70px; height: 70px; background: var(--bg-dark); border-radius: 8px; }
+        .cart-item-details { flex-grow: 1; }
+        .cart-item-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
+        .cart-item-price { color: var(--primary-color); font-weight: 600; }
+        .remove-item {
+            color: var(--error-color); cursor: pointer; font-size: 0.8rem;
+            text-decoration: underline; background: none; border: none; padding: 0;
+        }
+
+        .cart-footer { border-top: 2px solid var(--bg-dark); padding-top: 20px; }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; }
+        .summary-total { font-size: 1.5rem; font-weight: 800; color: var(--secondary-color); margin-bottom: 20px; }
+
+        /* 9. PAGE NAVIGATION (SPA LOGIC) */
+        .page { display: none; opacity: 0; transform: translateY(20px); transition: var(--transition); }
+        .page.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* 10. FORMS & INPUTS */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        .form-control {
+            width: 100%; padding: 15px; border: 2px solid var(--bg-dark);
+            border-radius: var(--border-radius); font-size: 1rem; transition: var(--transition);
+        }
+        .form-control:focus { border-color: var(--primary-color); background: white; }
+        
+        .checkout-container { max-width: 800px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        
+        /* 11. FOOTER MODULE */
+        footer {
+            background: var(--white); padding: 60px 8%; margin-top: 80px;
+            border-top: 1px solid var(--bg-dark); display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
+        }
+        footer h4 { margin-bottom: 20px; color: var(--secondary-color); }
+        footer p, footer li { color: var(--text-muted); font-size: 0.9rem; }
+        footer ul { list-style: none; padding: 0; }
+        footer ul li { margin-bottom: 10px; cursor: pointer; }
+        footer ul li:hover { color: var(--primary-color); }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--secondary-color); color: white; padding: 12px 30px;
+            border-radius: 50px; z-index: 3000; display: none; animation: slideUp 0.3s;
+        }
+        @keyframes slideUp { from { bottom: -50px; } to { bottom: 30px; } }
     </style>
 </head>
 <body>
 
-<div class="overlay" id="overlay" onclick="toggleCart()"></div>
-
-<header>
-    <div class="logo">GlowBeauty</div>
-    <button class="cart-icon-btn" onclick="toggleCart()">
-        🛒 <span id="cart-counter" class="cart-badge">0</span>
-    </button>
-</header>
-
-<div class="container">
-    <h2>Popular Products</h2>
-    <div id="products-list" class="products-grid"></div>
-</div>
-
-<!-- SINGLE SIDEBAR CART -->
-<div class="cart-sidebar" id="cart-sidebar">
-    <div class="cart-header">
-        <h3>Your Cart</h3>
-        <span class="close-cart" onclick="toggleCart()">×</span>
+    <!-- OVERLAY & SIDEBAR -->
+    <div class="drawer-overlay" id="overlay" onclick="App.toggleCart()"></div>
+    <div class="drawer" id="cart-drawer">
+        <div class="drawer-header">
+            <h3>Shopping Bag</h3>
+            <span class="close-btn" onclick="App.toggleCart()">✕</span>
+        </div>
+        <div class="cart-items-wrapper" id="cart-items-list">
+            <!-- Items rendered by JS -->
+        </div>
+        <div class="cart-footer">
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <span id="subtotal-amount">$0.00</span>
+            </div>
+            <div class="summary-line summary-total">
+                <span>Total</span>
+                <span id="total-amount">$0.00</span>
+            </div>
+            <button class="btn btn-primary" onclick="App.navigateTo('checkout')">Secure Checkout</button>
+        </div>
     </div>
 
-    <div id="cart-items-list" class="cart-items-list">
-        <!-- Items added dynamically -->
-    </div>
+    <!-- MAIN HEADER -->
+    <header>
+        <div class="logo" onclick="App.navigateTo('home')">GLOW BEAUTY</div>
+        <nav>
+            <ul>
+                <li><a onclick="App.navigateTo('home')">Home</a></li>
+                <li><a onclick="App.navigateTo('catalog')">Shop</a></li>
+                <li><a onclick="App.navigateTo('contact')">Support</a></li>
+            </ul>
+        </nav>
+        <div class="header-tools">
+            <button class="cart-trigger" onclick="App.toggleCart()">
+                🛒 <span id="cart-counter">0</span>
+            </button>
+        </div>
+    </header>
 
-    <div id="cart-footer">
-        <h4 id="cart-total">Total: $0</h4>
-        <button id="go-to-checkout" onclick="showCheckout()">Proceed to Checkout</button>
-    </div>
-
-    <!-- INTEGRATED CHECKOUT -->
-    <div id="checkout-section">
-        <h3>Checkout</h3>
-        <form id="order-form" onsubmit="processOrder(event)">
-            <input type="text" placeholder="Shipping Address" required>
-            <select required>
-                <option value="">Select Payment Method</option>
-                <option value="card">Credit Card</option>
-                <option value="cash">Cash on Delivery</option>
-            </select>
-            <button type="submit" style="background: #2ecc71; margin-top: 10px;">Place Order</button>
-            <button type="button" onclick="hideCheckout()" style="background: #95a5a6; margin-top: 5px;">Back to Cart</button>
-        </form>
-    </div>
-</div>
-
-<script>
-    const products = [
-        {id:1, name:"Hydrating Cream", price:25, color: "#ffeaa7"},
-        {id:2, name:"Vitamin C Serum", price:30, color: "#fab1a0"},
-        {id:3, name:"Matte Lipstick", price:15, color: "#ff7675"},
-        {id:4, name:"Eyeliner Pen", price:12, color: "#74b9ff"},
-        {id:5, name:"Night Repair", price:28, color: "#a29bfe"},
-        {id:6, name:"Face Mask Set", price:20, color: "#55efc4"}
-    ];
-
-    let cart = JSON.parse(localStorage.getItem('glow_cart_eng')) || [];
-
-    function toggleCart() {
-        document.getElementById('cart-sidebar').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
-        hideCheckout(); // Always reset to cart view when opening/closing
-    }
-
-    function initProducts() {
-        const grid = document.getElementById('products-list');
-        products.forEach(p => {
-            grid.innerHTML += `
-                <div class="card">
-                    <div class="card-img" style="background-color: ${p.color}"></div>
-                    <div class="card-content">
-                        <h3>${p.name}</h3>
-                        <p class="price">$${p.price}</p>
-                        <button onclick="addToCart(${p.id})">Add to Cart</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    function addToCart(id) {
-        const product = products.find(p => p.id === id);
-        cart.push(product);
-        updateCart();
-    }
-
-    function removeFromCart(index) {
-        cart.splice(index, 1);
-        updateCart();
-    }
-
-    function updateCart() {
-        localStorage.setItem('glow_cart_eng', JSON.stringify(cart));
-        document.getElementById('cart-counter').innerText = cart.length;
-        renderCartItems();
-    }
-
-    function renderCartItems() {
-        const list = document.getElementById('cart-items-list');
-        const totalElem = document.getElementById('cart-total');
-        const checkoutBtn = document.getElementById('go-to-checkout');
+    <!-- CONTENT AREAS -->
+    <main class="container">
         
-        list.innerHTML = cart.length === 0 ? '<p>Your cart is empty</p>' : '';
-        let total = 0;
+        <!-- MODULE: HOME -->
+        <section id="home-page" class="page active">
+            <div style="text-align: center; padding: 60px 0;">
+                <h1 style="font-size: 3.5rem; letter-spacing: -2px;">Elegance in Every <span style="color:var(--primary-color)">Glow</span></h1>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 20px auto 40px;">Experience premium skincare and beauty products curated for the modern individual.</p>
+                <button class="btn btn-primary" style="width: auto; padding: 15px 40px;" onclick="App.navigateTo('catalog')">Explore Collection</button>
+            </div>
+            <h2 class="section-title">New Arrivals</h2>
+            <div class="grid" id="featured-grid"></div>
+        </section>
 
-        cart.forEach((item, index) => {
-            total += item.price;
-            list.innerHTML += `
-                <div class="cart-item">
-                    <div>
-                        <strong>${item.name}</strong><br>
-                        <small>$${item.price}</small>
-                    </div>
-                    <button class="btn-remove" onclick="removeFromCart(${index})">Remove</button>
+        <!-- MODULE: CATALOG -->
+        <section id="catalog-page" class="page">
+            <h1 class="section-title">All Products</h1>
+            <div class="grid" id="full-catalog-grid"></div>
+        </section>
+
+        <!-- MODULE: PRODUCT DETAILS -->
+        <section id="details-page" class="page">
+            <div id="product-detail-view" style="display: flex; gap: 50px; background: white; padding: 40px; border-radius: 20px; box-shadow: var(--card-shadow);">
+                <!-- Dynamic content -->
+            </div>
+        </section>
+
+        <!-- MODULE: CHECKOUT -->
+        <section id="checkout-page" class="page">
+            <h1 class="section-title">Finalize Order</h1>
+            <div class="checkout-container">
+                <div class="checkout-form">
+                    <form id="order-form" onsubmit="App.handleCheckout(event)">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Shipping Address</label>
+                            <textarea class="form-control" rows="3" placeholder="123 Beauty St, Fashion City" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <select class="form-control" id="payment-method" required>
+                                <option value="card">Credit Card (Visa/Mastercard)</option>
+                                <option value="apple">Apple Pay</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="crypto">Cryptocurrency</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="height: 60px;">Confirm & Pay</button>
+                    </form>
                 </div>
-            `;
-        });
+                <div style="background: var(--bg-dark); padding: 30px; border-radius: var(--border-radius);">
+                    <h3>Order Summary</h3>
+                    <div id="checkout-summary-list"></div>
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;">
+                    <div class="summary-line summary-total" style="font-size: 1.2rem;">
+                        <span>Grand Total</span>
+                        <span class="final-checkout-total">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        totalElem.innerText = `Total: $${total}`;
-        checkoutBtn.style.display = cart.length > 0 ? 'block' : 'none';
-    }
+        <!-- MODULE: CONTACT -->
+        <section id="contact-page" class="page">
+            <div class="checkout-box" style="max-width: 600px; margin: auto; text-align: center;">
+                <h2>Customer Concierge</h2>
+                <p>Need assistance with your skin routine or an order? Our team is available 24/7.</p>
+                <form onsubmit="App.toast('Message sent! We will reply shortly.'); event.preventDefault();">
+                    <input type="email" class="form-control" placeholder="Your Email Address" required>
+                    <textarea class="form-control" placeholder="How can we help you?" rows="5" required></textarea>
+                    <button class="btn btn-primary">Send Inquiry</button>
+                </form>
+            </div>
+        </section>
 
-    function showCheckout() {
-        document.getElementById('cart-footer').style.display = 'none';
-        document.getElementById('cart-items-list').style.display = 'none';
-        document.getElementById('checkout-section').classList.add('visible');
-    }
+    </main>
 
-    function hideCheckout() {
-        document.getElementById('cart-footer').style.display = 'block';
-        document.getElementById('cart-items-list').style.display = 'block';
-        document.getElementById('checkout-section').classList.remove('visible');
-    }
+    <!-- 12. FOOTER SECTION -->
+    <footer>
+        <div>
+            <div class="logo">GLOW BEAUTY</div>
+            <p>Premium beauty solutions for global customers.</p>
+        </div>
+        <div>
+            <h4>Quick Links</h4>
+            <ul>
+                <li onclick="App.navigateTo('catalog')">Shop All</li>
+                <li>Best Sellers</li>
+                <li>Sustainability</li>
+                <li onclick="App.navigateTo('contact')">Contact Us</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Policies</h4>
+            <ul>
+                <li>Shipping Policy</li>
+                <li>Returns & Refunds</li>
+                <li>Privacy Policy</li>
+                <li>Terms of Service</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Stay Connected</h4>
+            <p>Subscribe for early access and beauty tips.</p>
+            <input type="text" placeholder="Email address" class="form-control" style="padding: 10px;">
+        </div>
+    </footer>
 
-    function processOrder(e) {
-        e.preventDefault();
-        alert('Thank you! Your order has been placed successfully.');
-        cart = [];
-        updateCart();
-        toggleCart();
-    }
+    <div id="toast"></div>
 
-    // Initialize
-    initProducts();
-    updateCart();
-</script>
+    <!-- 13. BUSINESS LOGIC MODULE (JAVASCRIPT) -->
+    <script>
+        const App = (() => {
+            // -- PRIVATE STATE --
+            const products = [
+                { id: 1, name: "Velvet Silk Cream", price: 45.00, category: "Skincare", desc: "Luxurious moisturizing cream infused with real silk proteins.", badge: "Best Seller" },
+                { id: 2, name: "Radiance Serum", price: 58.00, category: "Serums", desc: "A potent Vitamin C complex for immediate skin brightening.", badge: "New" },
+                { id: 3, name: "Oasis Face Mist", price: 22.50, category: "Mists", desc: "Refresh your glow anytime with rose water and aloe.", badge: "" },
+                { id: 4, name: "Midnight Recovery Oil", price: 65.00, category: "Oils", desc: "Plant-based oil that works while you sleep to repair skin.", badge: "Organic" },
+                { id: 5, name: "Matte Perfection Balm", price: 34.00, category: "Primers", desc: "The ultimate base for a flawless makeup application.", badge: "" },
+                { id: 6, name: "Ethereal Eyes Palette", price: 52.00, category: "Eyes", desc: "12 shimmering shades for a dreamy, versatile look.", badge: "Limited" },
+                { id: 7, name: "Cloud Cleansing Foam", price: 28.00, category: "Cleansers", desc: "Gentle amino-acid cleanser for all skin types.", badge: "Vegan" },
+                { id: 8, name: "Luminous Lip Glaze", price: 19.00, category: "Lips", desc: "Non-sticky shine with deep hydration.", badge: "" }
+            ];
 
+            let cart = JSON.parse(localStorage.getItem('glow_store_cart')) || [];
+
+            // -- CORE ENGINE --
+            const init = () => {
+                renderAllGrids();
+                syncCart();
+                setupNav();
+                log('Site initialized', { productCount: products.length });
+            };
+
+            const renderAllGrids = () => {
+                const homeGrid = document.getElementById('featured-grid');
+                const fullGrid = document.getElementById('full-catalog-grid');
+                
+                const buildHtml = (p) => `
+                    <div class="product-card">
+                        ${p.badge ? `<span class="badge">${p.badge}</span>` : ''}
+                        <div class="product-image-container">
+                            <div style="width:120px; height:120px; background:var(--primary-color); opacity:0.1; border-radius:50%"></div>
+                            <span style="position:absolute; font-size:4rem">✨</span>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">${p.category}</span>
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-price">$${p.price.toFixed(2)}</div>
+                            <button class="btn btn-primary" onclick="App.addToCart(${p.id})">Add to Bag</button>
+                            <button class="btn btn-outline" onclick="App.viewDetails(${p.id})">View Details</button>
+                        </div>
+                    </div>
+                `;
+
+                homeGrid.innerHTML = products.slice(0, 4).map(buildHtml).join('');
+                fullGrid.innerHTML = products.map(buildHtml).join('');
+            };
+
+            // -- NAVIGATION & UI --
+            const navigateTo = (pageId) => {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById(`${pageId}-page`);
+                target.classList.add('active');
+                
+                if (pageId === 'checkout') renderCheckoutSummary();
+                
+                // Sidebar behavior: close if nav clicked
+                document.getElementById('cart-drawer').classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                log('Page Navigation', { destination: pageId });
+            };
+
+            const toggleCart = () => {
+                document.getElementById('cart-drawer').classList.toggle('active');
+                document.getElementById('overlay').classList.toggle('active');
+            };
+
+            const toast = (msg) => {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.style.display = 'block';
+                setTimeout(() => { t.style.display = 'none'; }, 3000);
+            };
+
+            // -- CART LOGIC --
+            const addToCart = (productId) => {
+                const product = products.find(p => p.id === productId);
+                cart.push({ ...product, cartId: Date.now() });
+                syncCart();
+                toast(`${product.name} added to bag!`);
+                log('Item Added To Cart', { id: productId, name: product.name });
+            };
+
+            const removeCartItem = (cartId) => {
+                cart = cart.filter(item => item.cartId !== cartId);
+                syncCart();
+                if (document.getElementById('checkout-page').classList.contains('active')) {
+                    renderCheckoutSummary();
+                }
+            };
+
+            const syncCart = () => {
+                localStorage.setItem('glow_store_cart', JSON.stringify(cart));
+                document.getElementById('cart-counter').innerText = cart.length;
+                renderCartList();
+            };
+
+            const renderCartList = () => {
+                const list = document.getElementById('cart-items-list');
+                const subTotal = document.getElementById('subtotal-amount');
+                const total = document.getElementById('total-amount');
+
+                if (cart.length === 0) {
+                    list.innerHTML = `<div style="text-align:center; margin-top:50px; color:#999">Your bag is currently empty.</div>`;
+                    subTotal.innerText = '$0.00';
+                    total.innerText = '$0.00';
+                    return;
+                }
+
+                let sum = 0;
+                list.innerHTML = cart.map(item => {
+                    sum += item.price;
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-img"></div>
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                                <button class="remove-item" onclick="App.removeCartItem(${item.cartId})">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                subTotal.innerText = `$${sum.toFixed(2)}`;
+                total.innerText = `$${sum.toFixed(2)}`;
+            };
+
+            // -- DETAILS & CHECKOUT --
+            const viewDetails = (id) => {
+                const p = products.find(prod => prod.id === id);
+                document.getElementById('product-detail-view').innerHTML = `
+                    <div style="flex: 1; background: #f8f9fa; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 8rem;">💄</div>
+                    <div style="flex: 1;">
+                        <span class="product-category">${p.category}</span>
+                        <h1 style="font-size: 2.5rem; margin: 10px 0;">${p.name}</h1>
+                        <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px;">${p.desc}</p>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary-color); margin-bottom: 30px;">$${p.price.toFixed(2)}</div>
+                        <button class="btn btn-primary" style="padding: 20px;" onclick="App.addToCart(${p.id})">Add to Shopping Bag</button>
+                    </div>
+                `;
+                navigateTo('details');
+            };
+
+            const renderCheckoutSummary = () => {
+                const list = document.getElementById('checkout-summary-list');
+                const finalTotal = document.querySelectorAll('.final-checkout-total');
+                
+                let sum = 0;
+                list.innerHTML = cart.map(item => {
+                    sum += item.price;
+                    return `<div class="summary-line"><span>${item.name}</span><span>$${item.price.toFixed(2)}</span></div>`;
+                }).join('');
+                
+                finalTotal.forEach(el => el.innerText = `$${sum.toFixed(2)}`);
+            };
+
+            const handleCheckout = (e) => {
+                e.preventDefault();
+                if (cart.length === 0) return toast("Cannot checkout with an empty bag.");
+                
+                const method = document.getElementById('payment-method').value;
+                log('Order Placed', { cartSize: cart.length, paymentMethod: method });
+                
+                toast("Success! Your order is confirmed.");
+                cart = [];
+                syncCart();
+                navigateTo('home');
+            };
+
+            const log = (msg, meta = {}) => {
+                console.log(`[LOG]: ${msg}`, meta);
+                if (window.DD_LOGS) {
+                    window.DD_LOGS.logger.info(msg, meta);
+                }
+            };
+
+            return {
+                init, navigateTo, toggleCart, addToCart, removeCartItem, viewDetails, handleCheckout, toast
+            };
+        })();
+
+        // BOOTSTRAP APP
+        document.addEventListener('DOMContentLoaded', App.init);
+    </script>
 </body>
 </html>
