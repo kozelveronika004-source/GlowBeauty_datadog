@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowBeauty | Premium Skincare & Makeup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --primary: #ff85a2; --dark: #2d3436; --light: #f9f9f9; --white: #ffffff; --error: #ff4757; }
+  body { font-family: 'Inter', sans-serif; margin: 0; background: var(--light); color: var(--dark); line-height: 1.6; }
+  
+  /* Navigation */
+  header { background: var(--white); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+  .logo { font-size: 1.6rem; font-weight: 600; color: var(--primary); cursor: pointer; letter-spacing: -1px; }
+  nav a { text-decoration: none; color: var(--dark); margin: 0 15px; cursor: pointer; font-weight: 400; transition: 0.3s; }
+  nav a:hover { color: var(--primary); }
+  .cart-wrapper { cursor: pointer; font-size: 1.3rem; position: relative; }
+  #cart-counter { position: absolute; top: -8px; right: -10px; background: var(--primary); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: 600; }
+
+  /* Hero & Containers */
+  .container { padding: 40px 5%; max-width: 1200px; margin: 0 auto; min-height: 75vh; }
+  .page { display: none; animation: fadeIn 0.4s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  h2 { font-weight: 300; font-size: 2.2rem; text-align: center; margin-bottom: 40px; }
+
+  /* Grid & Product Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+  .card { background: var(--white); border-radius: 16px; overflow: hidden; border: 1px solid #eee; transition: 0.3s; display: flex; flex-direction: column; }
+  .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+  .card-img-box { height: 250px; width: 100%; overflow: hidden; background: #eee; }
+  .card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+  .card:hover img { transform: scale(1.05); }
+  .card-content { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .card-content h3 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 600; }
+  .card-content p { color: var(--primary); font-weight: 600; font-size: 1.3rem; margin: 10px 0; }
+  
+  /* Forms & UI Elements */
+  button { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 30px; cursor: pointer; width: 100%; font-weight: 600; transition: 0.3s; }
+  button:hover { opacity: 0.9; box-shadow: 0 5px 15px rgba(255, 133, 162, 0.4); }
+  .btn-remove { background: #f1f1f1; color: #666; font-size: 0.8rem; padding: 6px 12px; width: auto; border-radius: 8px; }
+  .btn-remove:hover { background: var(--error); color: white; }
+  
+  input, select, textarea { width: 100%; padding: 14px; margin: 12px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
+  input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(255, 133, 162, 0.1); }
+
+  .cart-item { display: flex; align-items: center; background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #eee; }
+  .cart-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
+
+  footer { text-align: center; padding: 50px; background: white; border-top: 1px solid #eee; color: #999; margin-top: 60px; }
+</style>
+
+<!-- DATADOG SDK -->
+<script src="https://www.datadoghq-browser-agent.com/us1/v5/datadog-logs.js" type="text/javascript"></script>
+<script>
+  window.DD_LOGS && window.DD_LOGS.init({
+      clientToken: 'pubf5f92c49b7fcf5ea84e77f7f817f2930', 
+      site: 'datadoghq.com', 
+      forwardErrorsToLogs: true,
+      sessionSampleRate: 100,
+      service: 'glow-beauty-full-site'
+  });
+</script>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="showPage('home')">GlowBeauty</div>
+  <nav>
+    <a onclick="showPage('home')">Home</a>
+    <a onclick="showPage('catalog')">Catalog</a>
+    <a onclick="showPage('contact')">Contact</a>
+  </nav>
+  <div class="cart-wrapper" onclick="showPage('cart')">🛒<span id="cart-counter">0</span></div>
+</header>
+
+<main class="container">
+  <!-- Home -->
+  <section id="home" class="page active">
+    <h2>New Arrivals ✨</h2>
+    <div class="grid" id="home-grid"></div>
+  </section>
+
+  <!-- Catalog -->
+  <section id="catalog" class="page">
+    <h2>Our Collection</h2>
+    <div class="grid" id="catalog-grid"></div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="page">
+    <h2>Get in Touch</h2>
+    <div style="max-width:550px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <input type="text" id="contact-name" placeholder="Full Name">
+        <input type="email" id="contact-email" placeholder="Email Address">
+        <textarea id="contact-message" rows="5" placeholder="How can we help you?"></textarea>
+        <button onclick="handleContactSubmit()">Send Message</button>
+    </div>
+  </section>
+
+  <!-- Cart -->
+  <section id="cart" class="page">
+    <h2>Your Cart</h2>
+    <div id="cart-list"></div>
+    <div id="cart-summary" style="text-align:right; margin-top:30px; display:none;">
+        <h3 id="total-price" style="font-size:1.8rem"></h3>
+        <button onclick="showPage('checkout')" style="width:280px;">Proceed to Checkout</button>
+    </div>
+  </section>
+
+  <!-- Checkout -->
+  <section id="checkout" class="page">
+    <h2>Finalize Order</h2>
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 50px;">
+        <div style="background: white; padding: 30px; border-radius: 20px;">
+            <h4>Shipping & Payment</h4>
+            <input type="text" id="check-name" placeholder="Receiver Name">
+            <input type="text" id="check-address" placeholder="Full Delivery Address">
+            <select id="check-payment">
+                <option value="">Choose Payment Method</option>
+                <option value="card">Credit Card</option>
+                <option value="apple">Apple Pay</option>
+                <option value="crypto">Crypto</option>
+            </select>
+            <button onclick="completeOrder()" style="margin-top:20px;">Place $ Order</button>
+        </div>
+        <div id="checkout-sidebar" style="background: #fff0f3; padding: 30px; border-radius: 20px;">
+            <h4>Summary</h4>
+            <div id="check-items-list" style="margin-bottom:20px; font-size:0.9rem"></div>
+            <h3 id="check-total-amount"></h3>
+        </div>
+    </div>
+  </section>
+</main>
+
+<footer><p>© 2026 GlowBeauty | Powered by Datadog Monitoring</p></footer>
+
+<script>
+// Расширенная база товаров с картинками
+const products = [
+  {id:1, name:"Hydrating Face Cream", price:25, img:"https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=400&q=80"},
+  {id:2, name:"Vitamin C Glow Serum", price:35, img:"https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=400&q=80"},
+  {id:3, name:"Velvet Matte Lipstick", price:18, img:"https://images.unsplash.com/photo-1586776977607-310e9c725c37?auto=format&fit=crop&w=400&q=80"},
+  {id:4, name:"Precision Eyeliner", price:14, img:"https://images.unsplash.com/photo-1625093765366-d3493a0f6da5?auto=format&fit=crop&w=400&q=80"},
+  {id:5, name:"Overnight Repair Mask", price:29, img:"https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=400&q=80"},
+  {id:6, name:"Rose Clay Mask", price:22, img:"https://images.unsplash.com/photo-1570194065650-d99fb4b8ccb0?auto=format&fit=crop&w=400&q=80"},
+  {id:7, name:"Organic Face Oil", price:42, img:"https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&w=400&q=80"},
+  {id:8, name:"Nude Eyeshadow Palette", price:45, img:"https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=400&q=80"},
+  {id:9, name:"Sun Protection SPF 50", price:27, img:"https://images.unsplash.com/photo-1556229167-731382ff5a09?auto=format&fit=crop&w=400&q=80"},
+  {id:10, name:"Cleansing Gel", price:19, img:"https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80"},
+  {id:11, name:"Highlighter Powder", price:21, img:"https://images.unsplash.com/photo-1599733594230-6b823276abcc?auto=format&fit=crop&w=400&q=80"},
+  {id:12, name:"Moisturizing Balm", price:12, img:"https://images.unsplash.com/photo-1591360236480-4ed861025a18?auto=format&fit=crop&w=400&q=80"}
+];
+
+let cart = [];
+
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id === 'checkout') renderCheckout();
+    window.scrollTo(0,0);
+    window.DD_LOGS && window.DD_LOGS.logger.info(`Navigation: ${id}`);
+}
+
+function renderProducts() {
+    const hG = document.getElementById('home-grid');
+    const cG = document.getElementById('catalog-grid');
+    products.forEach((p, i) => {
+        const html = `
+            <div class="card">
+                <div class="card-img-box"><img src="${p.img}" alt="${p.name}"></div>
+                <div class="card-content">
+                    <div>
+                        <h3>${p.name}</h3>
+                        <p>$${p.price}</p>
+                    </div>
+                    <button onclick="addToCart(${p.id})">Add to Cart</button>
+                </div>
+            </div>`;
+        if(i < 4) hG.innerHTML += html;
+        cG.innerHTML += html;
+    });
+}
+
+function addToCart(id) {
+    const p = products.find(x => x.id === id);
+    cart.push({...p, cartId: Math.random()});
+    updateCartUI();
+    window.DD_LOGS && window.DD_LOGS.logger.info('Cart update: Item added', { name: p.name, price: p.price });
+}
+
+function removeFromCart(cartId) {
+    cart = cart.filter(item => item.cartId !== cartId);
+    updateCartUI();
+    window.DD_LOGS && window.DD_LOGS.logger.info('Cart update: Item removed');
+}
+
+function updateCartUI() {
+    document.getElementById('cart-counter').innerText = cart.length;
+    const list = document.getElementById('cart-list');
+    const total = cart.reduce((s, i) => s + i.price, 0);
+    
+    if(cart.length === 0) {
+        list.innerHTML = "<div style='text-align:center; padding:50px;'><p>Your cart is empty.</p><button onclick='showPage(\"catalog\")' style='width:200px' class='btn-outline'>Shop Now</button></div>";
+        document.getElementById('cart-summary').style.display = 'none';
+    } else {
+        document.getElementById('cart-summary').style.display = 'block';
+        list.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <img src="${item.img}">
+                <div style="flex-grow:1">
+                    <div style="font-weight:600">${item.name}</div>
+                    <div style="color:var(--primary)">$${item.price}</div>
+                </div>
+                <button class="btn-remove" onclick="removeFromCart(${item.cartId})">Delete</button>
+            </div>
+        `).join('');
+        document.getElementById('total-price').innerText = `Total: $${total}`;
+    }
+}
+
+function renderCheckout() {
+    const list = document.getElementById('check-items-list');
+    const total = cart.reduce((s, i) => s + i.price, 0);
+    list.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.name}</span><span>$${i.price}</span></div>`).join('');
+    document.getElementById('check-total-amount').innerText = `Total: $${total}`;
+}
+
+function handleContactSubmit() {
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    if(!name || !email) {
+        alert('Please provide name and email!');
+        window.DD_LOGS && window.DD_LOGS.logger.error('Contact form error: missing email/name');
+        return;
+    }
+    alert(`Thank you, ${name}! We will reply to ${email} soon.`);
+    window.DD_LOGS && window.DD_LOGS.logger.info('Contact form success', { userEmail: email });
+    showPage('home');
+}
+
+function completeOrder() {
+    const name = document.getElementById('check-name').value;
+    const pay = document.getElementById('check-payment').value;
+    if(!name || !pay) {
+        alert('Please complete the form!');
+        window.DD_LOGS && window.DD_LOGS.logger.error('Checkout error: incomplete details');
+        return;
+    }
+    alert('Congratulations! Order placed.');
+    window.DD_LOGS && window.DD_LOGS.logger.warn('SALE COMPLETED', { amount: cart.reduce((s,i)=>s+i.price,0), customer: name });
+    cart = [];
+    updateCartUI();
+    showPage('home');
+}
+
+renderProducts();
+</script>
+</body>
+</html>
