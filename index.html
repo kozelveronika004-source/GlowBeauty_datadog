@@ -358,7 +358,7 @@
                 const item = state.products.find(p => p.id === id);
                 state.cart.push({ ...item, cartId: Math.random() });
                 syncCart();
-                if(window.DD_LOGS) window.DD_LOGS.logger.info("Product added to cart", { id });
+                if(window.datadogLogs) window.datadogLogs.logger.info("Product added to cart", { id });
             };
 
             const removeItem = (cartId) => {
