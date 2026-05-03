@@ -12,7 +12,7 @@
   // 1. Инициализация RUM (мониторинг сессий и действий)
   window.datadogRum && window.datadogRum.init({
     applicationId: 'bbd5f24e-0bd9-4094-b9e2-4f100af754d7',
-    clientToken: 'pub5d6ca463f2ee833563628fc62f89d507',
+    clientToken: '',
     site: 'datadoghq.eu',
     service: 'glow-beauty-site',
     env: 'prod',
@@ -27,7 +27,7 @@
 
   // 2. Инициализация Логов (сообщения из корзины и ошибки)
   window.datadogLogs && window.datadogLogs.init({
-    clientToken: 'pub5d6ca463f2ee833563628fc62f89d507',
+    clientToken: '',
     site: 'datadoghq.eu',
     forwardErrorsToLogs: true,
     sessionSampleRate: 100,
